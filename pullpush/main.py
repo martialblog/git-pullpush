@@ -22,10 +22,6 @@ def main():
     pull_from = cmd_arguments.pull_from
     push_into = cmd_arguments.push_into
 
-    #Just for testing since I'm too lazy to type/paste
-    pull_from = "https://github.com/martialblog/www-zweipunknull.git"
-    push_into = 'http://127.0.0.1:4567/root/zweipunknull.git'
-
     with tempfile.TemporaryDirectory() as temporary_dir:
         pp = PullPush(source_repo=pull_from, target_repo=push_into, repo_dir=temporary_dir)
         pp.pull()
