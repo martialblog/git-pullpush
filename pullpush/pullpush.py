@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# TODO Deploy Key Integration
+# TODO Slack Integration
 
 
 import git
