@@ -35,6 +35,10 @@ class PullPush:
         Pushes the previously pulled repo to the target_repo.
         """
 
+        if self.repo is None:
+            # TODO Better handling
+            return
+
         origin = self.repo.remotes.origin
         self.set_target_repo(target_repo)
         self.repo.create_head('master', origin.refs.master).set_tracking_branch(origin.refs.master)
