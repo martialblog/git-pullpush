@@ -6,25 +6,23 @@ import git
 
 class PullPush:
 
-    def __init__(self, source_repo, target_repo, repo_dir):
-        self.source_repo = source_repo
-        self.target_repo = target_repo
+    def __init__(self, repo_dir):
         self.repo_dir = repo_dir
         self.repo = None
 
-    def pull(self):
+    def pull(self, source_repo):
         """
-        Pulls the source_repo and stores it in a directory.
+        Pulls the remote source_repo and stores it in the repo_dir directory.
         """
 
         self.repo = git.Repo.init(self.repo_dir)
-        origin = self.repo.create_remote('origin', self.source_repo)
+        origin = self.repo.create_remote('origin', source_repo)
         origin.fetch()
         origin.pull(origin.refs[0].remote_head)
 
     def set_target_repo(self, new_url):
         """
-        Changes the target url.
+        Changes the target url of the previously pulled repo.
         """
 
         origin = self.repo.remotes.origin
@@ -32,12 +30,12 @@ class PullPush:
         cw.set("url", new_url)
         cw.release()
 
-    def push(self):
+    def push(self, target_repo):
         """
-        Pushes the repo to the new remote url.
+        Pushes the previously pulled repo to the target_repo.
         """
 
         origin = self.repo.remotes.origin
-        self.set_target_repo(self.target_repo)
+        self.set_target_repo(target_repo)
         self.repo.create_head('master', origin.refs.master).set_tracking_branch(origin.refs.master)
         origin.push()
