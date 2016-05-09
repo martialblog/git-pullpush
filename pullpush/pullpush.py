@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+# TODO Better Input and Expection Handling
 
 import git
 
