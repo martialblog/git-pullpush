@@ -45,7 +45,7 @@ class PullPush:
             print("No source repository defined.")
             return
 
-        if not new_url.startswith('git'):
+        if not target_repo.startswith('git'):
             print("Invalid target repository url.")
             return
 
