@@ -23,9 +23,9 @@ def main():
     push_into = cmd_arguments.push_into
 
     with tempfile.TemporaryDirectory() as temporary_dir:
-        pp = PullPush(source_repo=pull_from, target_repo=push_into, repo_dir=temporary_dir)
-        pp.pull()
-        pp.push()
+        pp = PullPush(repo_dir=temporary_dir)
+        pp.pull(pull_from)
+        pp.push(push_into)
 
 
 if __name__ == "__main__":
