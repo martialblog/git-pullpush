@@ -15,6 +15,11 @@ class PullPush:
         Pulls the remote source_repo and stores it in the repo_dir directory.
         """
 
+        # TODO Better handling
+        if not source_repo.startswith('git'):
+            print("Invalid source repository url.")
+            return
+
         self.repo = git.Repo.init(self.repo_dir)
         origin = self.repo.create_remote('origin', source_repo)
         origin.fetch()
@@ -35,8 +40,13 @@ class PullPush:
         Pushes the previously pulled repo to the target_repo.
         """
 
+        # TODO Better handling
         if self.repo is None:
-            # TODO Better handling
+            print("No source repository defined.")
+            return
+
+        if not new_url.startswith('git'):
+            print("Invalid target repository url.")
             return
 
         origin = self.repo.remotes.origin
