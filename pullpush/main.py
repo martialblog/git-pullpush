@@ -4,6 +4,7 @@
 # TODO Error/Expection Handling
 # TODO Retry-If-Fail implementation
 
+
 import tempfile
 from argparse import ArgumentParser
 from pullpush import PullPush
@@ -11,7 +12,7 @@ from pullpush import PullPush
 
 def main():
 
-    description = "Pull a git repository, pushes it somewhere and tells Slack about it"
+    description = "Pull a git repository, pushes it somewhere"
 
     #Parsing Command-Line Arguments
     argumentparser = ArgumentParser(description=description)
@@ -19,6 +20,7 @@ def main():
     argumentparser.add_argument('push_into', help='The repo to push into')
 
     cmd_arguments = argumentparser.parse_args()
+
     pull_from = cmd_arguments.pull_from
     push_into = cmd_arguments.push_into
 

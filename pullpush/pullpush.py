@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# TODO Better Input and Expection Handling
+
 
 import git
 
@@ -15,11 +15,7 @@ class PullPush:
         Pulls the remote source_repo and stores it in the repo_dir directory.
         """
 
-        # TODO Better handling
-        if not source_repo.endswith('git'):
-            print("Invalid source repository url.")
-            return
-
+        #TODO Catch possible exceptions: source_repo not defined
         self.repo = git.Repo.init(self.repo_dir)
         origin = self.repo.create_remote('origin', source_repo)
         origin.fetch()
@@ -30,6 +26,7 @@ class PullPush:
         Changes the target url of the previously pulled repo.
         """
 
+        #TODO Catch possible exceptions: Repo not initialized
         origin = self.repo.remotes.origin
         cw = origin.config_writer
         cw.set("url", new_url)
@@ -40,15 +37,7 @@ class PullPush:
         Pushes the previously pulled repo to the target_repo.
         """
 
-        # TODO Better handling
-        if self.repo is None:
-            print("No source repository defined.")
-            return
-
-        if not target_repo.endswith('git'):
-            print("Invalid target repository url.")
-            return
-
+        #TODO Catch possible exceptions: Repo not initialized
         origin = self.repo.remotes.origin
         self.set_target_repo(target_repo)
         self.repo.create_head('master', origin.refs.master).set_tracking_branch(origin.refs.master)
