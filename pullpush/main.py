@@ -12,7 +12,7 @@ from pullpush import PullPush
 
 def main():
 
-    description = "Pull a git repository, pushes it somewhere"
+    description = "Pulls a git repository and pushes it somewhere"
 
     #Parsing Command-Line Arguments
     argumentparser = ArgumentParser(description=description)

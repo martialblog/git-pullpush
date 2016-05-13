@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# TODO Test if different branch names make trouble
 
 
 import git
@@ -7,12 +8,20 @@ import git
 class PullPush:
 
     def __init__(self, repo_dir):
+        """
+        Arguments:
+        repo_dir -- Directory in which to pull into
+        """
+
         self.repo_dir = repo_dir
         self.repo = None
 
     def pull(self, source_repo):
         """
-        Pulls the remote source_repo and stores it in the repo_dir directory.
+        Pulls from a remote repository and stores it in the directory.
+
+        Arguments:
+        source_repo -- URL of the remote git repository
         """
 
         #TODO Catch possible exceptions: source_repo not defined
@@ -24,6 +33,9 @@ class PullPush:
     def set_target_repo(self, new_url):
         """
         Changes the target url of the previously pulled repo.
+
+        Arguments:
+        new_url -- New remote url of the repository
         """
 
         #TODO Catch possible exceptions: Repo not initialized
@@ -34,7 +46,10 @@ class PullPush:
 
     def push(self, target_repo):
         """
-        Pushes the previously pulled repo to the target_repo.
+        Pushes the previously pulled repo to the target repository.
+
+        Arguments:
+        target_repo: Url of the target remote repository
         """
 
         #TODO Catch possible exceptions: Repo not initialized
