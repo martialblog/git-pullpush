@@ -10,24 +10,24 @@ from argparse import ArgumentParser
 from pullpush import PullPush
 
 
+DESC = 'Pulls a git repository and pushes it somewhere'
+
+
 def main():
 
-    description = "Pulls a git repository and pushes it somewhere"
-
-    #Parsing Command-Line Arguments
-    argumentparser = ArgumentParser(description=description)
-    argumentparser.add_argument('pull_from', help='The repo to pull from')
-    argumentparser.add_argument('push_into', help='The repo to push into')
+    argumentparser = ArgumentParser(description=DESC)
+    argumentparser.add_argument('--from', required=True, help='The repo to pull from')
+    argumentparser.add_argument('--into', required=True, help='The repo to push into')
 
     cmd_arguments = argumentparser.parse_args()
 
-    pull_from = cmd_arguments.pull_from
-    push_into = cmd_arguments.push_into
+    origin = cmd_arguments.pull_from
+    target = cmd_arguments.push_into
 
-    with tempfile.TemporaryDirectory() as temporary_dir:
-        pp = PullPush(repo_dir=temporary_dir)
-        pp.pull(pull_from)
-        pp.push(push_into)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        pp = PullPush(repo_dir=temp_dir)
+        pp.pull(origin)
+        pp.push(target)
 
 
 if __name__ == "__main__":
