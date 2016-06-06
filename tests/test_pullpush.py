@@ -6,6 +6,9 @@ import unittest
 import git
 import os
 import shutil
+import time
+
+import pullpush.pullpush as pp
 
 
 class mockrepo:
@@ -16,7 +19,6 @@ class mockrepo:
     GIT_DAEMON_PORT = 4567
     TMP_DIR = tempfile.TemporaryDirectory(suffix='pullpush-unittest-repos')
 
-
     def __init__(self, *repo):
         self.repos = repo
         self.gd = git.Git().daemon(mockrepo.TMP_DIR.name,
@@ -24,6 +26,7 @@ class mockrepo:
                                    listen='127.0.0.1',
                                    port=mockrepo.GIT_DAEMON_PORT,
                                    as_process=True)
+        time.sleep(0.5)
 
     def __call__(self, func):
 
@@ -50,7 +53,7 @@ class mockrepo:
         Removes a repository folder.
         """
 
-        repo_dir = os.path.join(mockrepo.TMP_DIR.name, reponame)
+        repo_dir = os.path.join(mockrepo.TMP_DIR.name)
         shutil.rmtree(repo_dir)
 
 
@@ -77,22 +80,44 @@ class PullPushTest(unittest.TestCase):
     Some basic tests to check the PullPush class
     """
 
-    @mockrepo('repo1', 'repo2')
+    def setUp(self):
+        #TODO Setup TemporaryDirectory
+        pass
+
+
+    @mockrepo('test_pull_repo')
     def test_pull(self):
 
-        repo_dir = os.path.join(mockrepo.TMP_DIR.name, 'something')
-        remote_repo_url = "git://127.0.0.1:%s%s%s" % (mockrepo.GIT_DAEMON_PORT,
+        repo_dir = os.path.join(mockrepo.TMP_DIR.name, 'test_pull')
+        remote_repo_url = "git://localhost:%s%s%s" % (mockrepo.GIT_DAEMON_PORT,
                                                       mockrepo.TMP_DIR.name,
-                                                      '/repo1')
-
-        git.Repo.clone_from(remote_repo_url, repo_dir)
-
-        assert True
+                                                      '/test_pull_repo')
 
 
-    def test_push(self):
-        assert True
+        pull = pp.PullPush(repo_dir=repo_dir)
+        pull.pull(remote_repo_url)
+
+        self.assertEqual(os.path.isdir(repo_dir + '/.git'), True)
 
 
+    # @mockrepo('test_push_repo1', 'test_push_repo2')
+    # def test_push(self):
+
+    #     assert True
+
+
+    @mockrepo('test_url')
     def test_set_remote_url(self):
+
+        repo_dir = os.path.join(mockrepo.TMP_DIR.name, 'test_remote_url')
+        print(os.path.isdir(mockrepo.TMP_DIR.name))
+        remote_repo_url = "git://localhost:%s%s%s" % (mockrepo.GIT_DAEMON_PORT,
+                                                      mockrepo.TMP_DIR.name,
+                                                      '/test_url')
+
+        test_pp = pp.PullPush(repo_dir=repo_dir)
+        test_pp.pull(remote_repo_url)
+        test_pp.set_remote_url('new_url')
+
+        # TODO self.AssertEqual(test_pp.remote_url, 'new_url)
         assert True
