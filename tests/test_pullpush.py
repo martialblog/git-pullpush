@@ -7,8 +7,11 @@ import git
 import os
 import shutil
 import time
-
 import pullpush.pullpush as pp
+
+
+TMP_DIR = tempfile.TemporaryDirectory(suffix='pullpush-unittest-repos')
+GIT_DAEMON_PORT = 4567
 
 
 class mockrepo:
@@ -16,17 +19,10 @@ class mockrepo:
     Initializes a mock repo for the unittest.
     """
 
-    GIT_DAEMON_PORT = 4567
-    TMP_DIR = tempfile.TemporaryDirectory(suffix='pullpush-unittest-repos')
-
-    def __init__(self, *repo):
+    def __init__(self, repo_dir, *repo):
         self.repos = repo
-        self.gd = git.Git().daemon(mockrepo.TMP_DIR.name,
-                                   enable='receive-pack',
-                                   listen='127.0.0.1',
-                                   port=mockrepo.GIT_DAEMON_PORT,
-                                   as_process=True)
-        time.sleep(0.5)
+        self.repo_dir = repo_dir
+
 
     def __call__(self, func):
 
@@ -37,23 +33,25 @@ class mockrepo:
 
         return wrapper
 
+
     def create_repo(self, reponame):
         """
         Creates a test repo in the /tmp dir and commits an empty file.
         """
 
-        repo_dir = os.path.join(mockrepo.TMP_DIR.name, reponame)
+        repo_dir = os.path.join(self.repo_dir, reponame)
         repo = git.Repo.init(repo_dir, shared=True, bare=True)
         repo.daemon_export = True
 
         # TODO Commit test file to repo
+
 
     def remove_repo(self, reponame):
         """
         Removes a repository folder.
         """
 
-        repo_dir = os.path.join(mockrepo.TMP_DIR.name)
+        repo_dir = os.path.join(self.repo_dir)
         shutil.rmtree(repo_dir)
 
 
@@ -68,9 +66,6 @@ class mockrepo:
 
     def teardown_mockrepos(self):
 
-        if self.gd is not None:
-            os.kill(self.gd.proc.pid, 15)
-
         for reponame in self.repos:
             self.remove_repo(reponame)
 
@@ -81,16 +76,26 @@ class PullPushTest(unittest.TestCase):
     """
 
     def setUp(self):
-        #TODO Setup TemporaryDirectory
-        pass
+
+        self.gd = git.Git().daemon(TMP_DIR.name,
+                                   enable='receive-pack',
+                                   listen='127.0.0.1',
+                                   port=GIT_DAEMON_PORT,
+                                   as_process=True)
 
 
-    @mockrepo('test_pull_repo')
+    def tearDown(self):
+
+        if self.gd is not None:
+            os.kill(self.gd.proc.pid, 15)
+
+
+    @mockrepo(TMP_DIR.name, 'test_pull_repo')
     def test_pull(self):
 
-        repo_dir = os.path.join(mockrepo.TMP_DIR.name, 'test_pull')
-        remote_repo_url = "git://localhost:%s%s%s" % (mockrepo.GIT_DAEMON_PORT,
-                                                      mockrepo.TMP_DIR.name,
+        repo_dir = os.path.join(TMP_DIR.name, 'test_pull')
+        remote_repo_url = "git://localhost:%s%s%s" % (GIT_DAEMON_PORT,
+                                                      TMP_DIR.name,
                                                       '/test_pull_repo')
 
 
@@ -100,10 +105,10 @@ class PullPushTest(unittest.TestCase):
         self.assertEqual(os.path.isdir(repo_dir + '/.git'), True)
 
 
-    # @mockrepo('test_push_repo1', 'test_push_repo2')
-    # def test_push(self):
+    @mockrepo('test_push_repo1', 'test_push_repo2')
+    def test_push(self):
 
-    #     assert True
+        assert True
 
 
     @mockrepo('test_url')
