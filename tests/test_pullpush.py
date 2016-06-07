@@ -5,11 +5,9 @@ import tempfile
 import unittest
 import git
 import os
-import shutil
-import time
-
 import pullpush.pullpush as pp
 
+# Needs to be here cause of scope
 TMP_DIR = tempfile.TemporaryDirectory(suffix='pullpush-unittest-repos')
 
 class PullPushTest(unittest.TestCase):
@@ -19,7 +17,7 @@ class PullPushTest(unittest.TestCase):
 
     def setUp(self):
 
-
+        # TODO Some stuff can probably moved to own function
         self.PORT = 4567
         self.repos = {
             'test_pullpush_origin': 'URL',
@@ -61,20 +59,32 @@ class PullPushTest(unittest.TestCase):
 
         repo_dir = os.path.join(TMP_DIR.name, 'test_push_repo')
         PullPush = pp.PullPush(repo_dir=repo_dir)
+
         PullPush.pull(self.repos['test_pullpush_origin'])
 
-        self.assertEqual(os.path.isdir(repo_dir + '/.git'), True)
+        # Need a commit of we cant push
+        tmpfile = tempfile.NamedTemporaryFile(dir=repo_dir)
+        index = PullPush.repo.index
+        index.add([tmpfile.name])
+        index.commit('Unittest Commit')
 
+        PullPush.push(self.repos['test_pullpush_target'])
+
+        # TODO What to assert?
         assert True
 
 
     def test_set_remote_url(self):
 
+        expected_url = 'unittest_url'
         repo_dir = os.path.join(TMP_DIR.name, 'test_remoteurl_repo')
         PullPush = pp.PullPush(repo_dir=repo_dir)
+
         PullPush.pull(self.repos['test_pullpush_origin'])
+        PullPush.set_remote_url(expected_url)
 
-        PullPush.set_remote_url('new_url')
+        origin = PullPush.repo.remotes.origin
+        cr = origin.config_writer
+        actual_url = cr.get_value('url')
 
-        # TODO self.AssertEqual(test_pp.remote_url, 'new_url)
-        assert True
+        self.assertEqual(actual_url, expected_url)
