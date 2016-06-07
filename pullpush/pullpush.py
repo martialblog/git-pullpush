@@ -33,8 +33,10 @@ class PullPush:
         """
 
         #TODO Catch possible exceptions: Repo not initialized
-        option = 'set-url origin ' + new_url
-        self.repo.git.remote(option)
+        origin = self.repo.remotes.origin
+        cw = origin.config_writer
+        cw.set("url", new_url)
+        cw.release()
 
 
     def push(self, target):
