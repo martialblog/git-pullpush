@@ -16,13 +16,13 @@ DESC = 'Pulls a git repository and pushes it somewhere'
 def main():
 
     argumentparser = ArgumentParser(description=DESC)
-    argumentparser.add_argument('--from', required=True, help='The repo to pull from')
-    argumentparser.add_argument('--into', required=True, help='The repo to push into')
+    argumentparser.add_argument('--from', dest='pullfrom', required=True, help='The repo to pull from')
+    argumentparser.add_argument('--into', dest='pushto', required=True, help='The repo to push into')
 
     cmd_arguments = argumentparser.parse_args()
 
-    origin = cmd_arguments.pull_from
-    target = cmd_arguments.push_into
+    origin = cmd_arguments.pullfrom
+    target = cmd_arguments.pushto
 
     with tempfile.TemporaryDirectory() as temp_dir:
         pp = PullPush(repo_dir=temp_dir)
