@@ -23,7 +23,6 @@ class PullPush:
         :param origin: URL of the remote git repository
         """
 
-        #TODO Catch possible exceptions: source_repo not defined
         try:
             self.repo = git.Repo.clone_from(origin, self.repo_dir)
         except git.exc.GitCommandError as e:
@@ -37,7 +36,6 @@ class PullPush:
         :param new_url: New remote url of the repository
         """
 
-        #TODO Catch possible exceptions: Repo not initialized
         try:
             origin = self.repo.remotes.origin
             cw = origin.config_writer
@@ -54,7 +52,6 @@ class PullPush:
         :param target_repo: Url of the target remote repository
         """
 
-        #TODO Catch possible exceptions: Repo not initialized
         self.set_remote_url(target)
 
         try:
