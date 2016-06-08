@@ -47,4 +47,4 @@ class PullPush:
 
         #TODO Catch possible exceptions: Repo not initialized
         self.set_remote_url(target)
-        self.repo.git.push()
+        self.repo.git.push('--all')
