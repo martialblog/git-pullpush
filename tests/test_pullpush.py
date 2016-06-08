@@ -2,6 +2,7 @@
 
 
 import tempfile
+import time
 import unittest
 import git
 import os
@@ -49,6 +50,8 @@ class PullPushTest(unittest.TestCase):
                                                                '/' + reponame)
 
         self.gd = self.git_daemon(self.PORT, TMP_DIR.name)
+        # Sometimes I think the daemon doesn't start propertly
+        time.sleep(2)
 
 
     def tearDown(self):
@@ -62,8 +65,9 @@ class PullPushTest(unittest.TestCase):
         repo_dir = os.path.join(TMP_DIR.name, 'test_pull_repo')
         PullPush = pp.PullPush(repo_dir=repo_dir)
         PullPush.pull(self.repos['test_pullpush_origin'])
+        was_pulled = os.path.isdir(repo_dir + '/.git')
 
-        self.assertEqual(os.path.isdir(repo_dir + '/.git'), True)
+        self.assertEqual(was_pulled, True)
 
 
     def test_set_remote_url(self):
@@ -76,7 +80,7 @@ class PullPushTest(unittest.TestCase):
         PullPush.set_remote_url(expected_url)
 
         origin = PullPush.repo.remotes.origin
-        cr = origin.config_writer
+        cr = origin.config_reader
         actual_url = cr.get_value('url')
 
         self.assertEqual(actual_url, expected_url)
@@ -84,18 +88,20 @@ class PullPushTest(unittest.TestCase):
 
     def test_push(self):
 
-        # repo_dir = os.path.join(TMP_DIR.name, 'test_push_repo')
-        # PullPush = pp.PullPush(repo_dir=repo_dir)
+        repo_dir = os.path.join(TMP_DIR.name, 'test_push_repo')
+        PullPush = pp.PullPush(repo_dir=repo_dir)
 
-        # PullPush.pull(self.repos['test_pullpush_origin'])
+        PullPush.pull(self.repos['test_pullpush_origin'])
 
         # # Need a commit of we cant push
-        # tmpfile = tempfile.NamedTemporaryFile(dir=repo_dir)
-        # index = PullPush.repo.index
-        # index.add([tmpfile.name])
-        # index.commit('Unittest Commit')
+        tmpfile = tempfile.NamedTemporaryFile(dir=repo_dir)
+        index = PullPush.repo.index
+        index.add([tmpfile.name])
+        index.commit('Unittest Commit')
 
-        # PullPush.push(self.repos['test_pullpush_target'])
+        PullPush.push(self.repos['test_pullpush_target'])
 
-        # TODO What to assert?
-        assert True
+        #TODO
+        was_pushed = os.path.isfile('...')
+
+        self.assertEqual(was_pushed, True)
