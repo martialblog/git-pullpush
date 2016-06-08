@@ -6,7 +6,7 @@
 from tempfile import TemporaryDirectory
 from argparse import ArgumentParser
 from pullpush import PullPush
-
+from sys import exit
 
 DESC = 'Pulls a git repository and pushes it somewhere'
 HELP_PULL = 'The repo to pull from'
@@ -32,3 +32,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    exit(0)
