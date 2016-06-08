@@ -22,6 +22,17 @@ class PullPushTest(unittest.TestCase):
         repo.daemon_export = True
 
 
+    def git_daemon(self, _port, _basedir):
+
+        gd = git.Git().daemon(_basedir,
+                              enable='receive-pack',
+                              listen='127.0.0.1',
+                              port=_port,
+                              as_process=True)
+
+        return gd
+
+
     def setUp(self):
 
         # TODO Some stuff can probably moved to own function
@@ -37,11 +48,7 @@ class PullPushTest(unittest.TestCase):
                                                                TMP_DIR.name,
                                                                '/' + reponame)
 
-        self.gd = git.Git().daemon(TMP_DIR.name,
-                                   enable='receive-pack',
-                                   listen='127.0.0.1',
-                                   port=self.PORT,
-                                   as_process=True)
+        self.gd = self.git_daemon(self.PORT, TMP_DIR.name)
 
 
     def tearDown(self):
