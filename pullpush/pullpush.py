@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 
+import sys
 import git
 
 
@@ -23,7 +24,11 @@ class PullPush:
         """
 
         #TODO Catch possible exceptions: source_repo not defined
-        self.repo = git.Repo.clone_from(origin, self.repo_dir)
+        try:
+            self.repo = git.Repo.clone_from(origin, self.repo_dir)
+        except git.exc.GitCommandError as e:
+            print("ERROR: Could not Clone from Repo", file=sys.stderr)
+            print(e)
 
 
     def set_remote_url(self, new_url):
@@ -33,10 +38,14 @@ class PullPush:
         """
 
         #TODO Catch possible exceptions: Repo not initialized
-        origin = self.repo.remotes.origin
-        cw = origin.config_writer
-        cw.set("url", new_url)
-        cw.release()
+        try:
+            origin = self.repo.remotes.origin
+            cw = origin.config_writer
+            cw.set("url", new_url)
+            cw.release()
+        except git.exc.GitCommandError as e:
+            print("ERROR: Could not change Remote URL", file=sys.stderr)
+            print(e)
 
 
     def push(self, target):
@@ -47,4 +56,9 @@ class PullPush:
 
         #TODO Catch possible exceptions: Repo not initialized
         self.set_remote_url(target)
-        self.repo.git.push('--all')
+
+        try:
+            self.repo.git.push('--all')
+        except git.exc.GitCommandError as e:
+            print("ERROR: Could not Push to Repo", file=sys.stderr)
+            print(e)
