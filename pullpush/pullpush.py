@@ -25,9 +25,10 @@ class PullPush:
 
         try:
             self.repo = git.Repo.clone_from(origin, self.repo_dir)
-        except git.exc.GitCommandError as e:
-            print("ERROR: Could not Clone from Repo", file=sys.stderr)
-            print(e)
+        except git.exc.GitCommandError as exception:
+            print("ERROR: Could not Clone from Repo. Exiting...", file=sys.stderr)
+            print(exception)
+            sys.exit(1)
 
 
     def set_remote_url(self, new_url):
@@ -41,9 +42,10 @@ class PullPush:
             cw = origin.config_writer
             cw.set("url", new_url)
             cw.release()
-        except git.exc.GitCommandError as e:
+        except git.exc.GitCommandError as exception:
             print("ERROR: Could not change Remote URL", file=sys.stderr)
-            print(e)
+            print(exception)
+            sys.exit(1)
 
 
     def push(self, target):
@@ -56,6 +58,7 @@ class PullPush:
 
         try:
             self.repo.git.push('--all')
-        except git.exc.GitCommandError as e:
+        except git.exc.GitCommandError as exception:
             print("ERROR: Could not Push to Repo", file=sys.stderr)
-            print(e)
+            print(exception)
+            sys.exit(1)
