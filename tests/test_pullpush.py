@@ -15,6 +15,13 @@ class PullPushTest(unittest.TestCase):
     Some basic tests to check the PullPush class
     """
 
+    def create_repodir(self, name):
+
+        repo_dir = os.path.join(TMP_DIR.name, name)
+        repo = git.Repo.init(repo_dir, shared=True, bare=True)
+        repo.daemon_export = True
+
+
     def setUp(self):
 
         # TODO Some stuff can probably moved to own function
@@ -25,10 +32,7 @@ class PullPushTest(unittest.TestCase):
             }
 
         for reponame in self.repos.keys():
-            repo_dir = os.path.join(TMP_DIR.name, reponame)
-            repo = git.Repo.init(repo_dir, shared=True, bare=True)
-            repo.daemon_export = True
-
+            self.create_repodir(reponame)
             self.repos[reponame] = "git://localhost:%s%s%s" % (self.PORT,
                                                                TMP_DIR.name,
                                                                '/' + reponame)
@@ -55,25 +59,6 @@ class PullPushTest(unittest.TestCase):
         self.assertEqual(os.path.isdir(repo_dir + '/.git'), True)
 
 
-    def test_push(self):
-
-        repo_dir = os.path.join(TMP_DIR.name, 'test_push_repo')
-        PullPush = pp.PullPush(repo_dir=repo_dir)
-
-        PullPush.pull(self.repos['test_pullpush_origin'])
-
-        # Need a commit of we cant push
-        tmpfile = tempfile.NamedTemporaryFile(dir=repo_dir)
-        index = PullPush.repo.index
-        index.add([tmpfile.name])
-        index.commit('Unittest Commit')
-
-        PullPush.push(self.repos['test_pullpush_target'])
-
-        # TODO What to assert?
-        assert True
-
-
     def test_set_remote_url(self):
 
         expected_url = 'unittest_url'
@@ -88,3 +73,22 @@ class PullPushTest(unittest.TestCase):
         actual_url = cr.get_value('url')
 
         self.assertEqual(actual_url, expected_url)
+
+
+    def test_push(self):
+
+        # repo_dir = os.path.join(TMP_DIR.name, 'test_push_repo')
+        # PullPush = pp.PullPush(repo_dir=repo_dir)
+
+        # PullPush.pull(self.repos['test_pullpush_origin'])
+
+        # # Need a commit of we cant push
+        # tmpfile = tempfile.NamedTemporaryFile(dir=repo_dir)
+        # index = PullPush.repo.index
+        # index.add([tmpfile.name])
+        # index.commit('Unittest Commit')
+
+        # PullPush.push(self.repos['test_pullpush_target'])
+
+        # TODO What to assert?
+        assert True
