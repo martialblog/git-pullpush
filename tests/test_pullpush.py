@@ -7,9 +7,22 @@ import unittest
 import git
 import os
 import pullpush.pullpush as pp
+import shutil
 
 # Needs to be here cause of scope
-TMP_DIR = tempfile.TemporaryDirectory(suffix='pullpush-unittest-repos')
+TMP_DIR = tempfile.mkdtemp(suffix='pullpush-unittest-repos')
+
+# Sometime the gd doesn't seem to serve the repos
+# I have to idea why! -.-
+# Must have something to do with the time cause if I wait a bit it works
+gd = git.Git().daemon(TMP_DIR,
+                      enable='receive-pack',
+                      listen='127.0.0.1',
+                      port=4567,
+                      as_process=True)
+
+time.sleep(2)
+
 
 class PullPushTest(unittest.TestCase):
     """
@@ -18,20 +31,9 @@ class PullPushTest(unittest.TestCase):
 
     def create_repodir(self, name):
 
-        repo_dir = os.path.join(TMP_DIR.name, name)
+        repo_dir = os.path.join(TMP_DIR, name)
         repo = git.Repo.init(repo_dir, shared=True, bare=True)
         repo.daemon_export = True
-
-
-    def git_daemon(self, _port, _basedir):
-
-        gd = git.Git().daemon(_basedir,
-                              enable='receive-pack',
-                              listen='127.0.0.1',
-                              port=_port,
-                              as_process=True)
-
-        return gd
 
 
     def setUp(self):
@@ -46,23 +48,17 @@ class PullPushTest(unittest.TestCase):
         for reponame in self.repos.keys():
             self.create_repodir(reponame)
             self.repos[reponame] = "git://localhost:%s%s%s" % (self.PORT,
-                                                               TMP_DIR.name,
+                                                               TMP_DIR,
                                                                '/' + reponame)
-
-        self.gd = self.git_daemon(self.PORT, TMP_DIR.name)
-        # Sometimes I think the daemon doesn't start propertly
-        time.sleep(2)
-
 
     def tearDown(self):
 
-        if self.gd is not None:
-            os.kill(self.gd.proc.pid, 15)
+        shutil.rmtree(TMP_DIR)
 
 
     def test_pull(self):
 
-        repo_dir = os.path.join(TMP_DIR.name, 'test_pull_repo')
+        repo_dir = os.path.join(TMP_DIR, 'test_pull_repo')
         PullPush = pp.PullPush(repo_dir=repo_dir)
         PullPush.pull(self.repos['test_pullpush_origin'])
         was_pulled = os.path.isdir(repo_dir + '/.git')
@@ -73,7 +69,7 @@ class PullPushTest(unittest.TestCase):
     def test_set_remote_url(self):
 
         expected_url = 'unittest_url'
-        repo_dir = os.path.join(TMP_DIR.name, 'test_remoteurl_repo')
+        repo_dir = os.path.join(TMP_DIR, 'test_remoteurl_repo')
         PullPush = pp.PullPush(repo_dir=repo_dir)
 
         PullPush.pull(self.repos['test_pullpush_origin'])
@@ -88,7 +84,7 @@ class PullPushTest(unittest.TestCase):
 
     def test_push(self):
 
-        repo_dir = os.path.join(TMP_DIR.name, 'test_push_repo')
+        repo_dir = os.path.join(TMP_DIR, 'test_push_repo')
         PullPush = pp.PullPush(repo_dir=repo_dir)
 
         PullPush.pull(self.repos['test_pullpush_origin'])
@@ -101,7 +97,10 @@ class PullPushTest(unittest.TestCase):
 
         PullPush.push(self.repos['test_pullpush_target'])
 
-        #TODO
-        was_pushed = os.path.isfile('...')
-
+        was_pushed = os.path.exists(tmpfile.name)
         self.assertEqual(was_pushed, True)
+
+
+if __name__ == "__main__":
+    unittest.main()
+    gd.proc.terminate()
