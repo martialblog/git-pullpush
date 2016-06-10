@@ -9,18 +9,20 @@ import os
 import pullpush.pullpush as pp
 import shutil
 
-# Needs to be here cause of scope
-TMP_DIR = tempfile.mkdtemp(suffix='pullpush-unittest-repos')
 
+TMP_DIR = tempfile.mkdtemp(suffix='pullpush-unittest-repos')
+PORT = 4567
+
+
+# TODO
 # Sometime the gd doesn't seem to serve the repos
 # I have to idea why! -.-
 # Must have something to do with the time cause if I wait a bit it works
 gd = git.Git().daemon(TMP_DIR,
                       enable='receive-pack',
                       listen='127.0.0.1',
-                      port=4567,
+                      port=PORT,
                       as_process=True)
-
 time.sleep(2)
 
 
@@ -38,8 +40,6 @@ class PullPushTest(unittest.TestCase):
 
     def setUp(self):
 
-        # TODO Some stuff can probably moved to own function
-        self.PORT = 4567
         self.repos = {
             'test_pullpush_origin': 'URL',
             'test_pullpush_target': 'URL',
@@ -47,7 +47,7 @@ class PullPushTest(unittest.TestCase):
 
         for reponame in self.repos.keys():
             self.create_repodir(reponame)
-            self.repos[reponame] = "git://localhost:%s%s%s" % (self.PORT,
+            self.repos[reponame] = "git://localhost:%s%s%s" % (PORT,
                                                                TMP_DIR,
                                                                '/' + reponame)
 
@@ -57,16 +57,22 @@ class PullPushTest(unittest.TestCase):
 
 
     def test_pull(self):
+        """
+        We test if an empty directory has a .git directory after the pull.
+        """
 
         repo_dir = os.path.join(TMP_DIR, 'test_pull_repo')
         PullPush = pp.PullPush(repo_dir=repo_dir)
         PullPush.pull(self.repos['test_pullpush_origin'])
-        was_pulled = os.path.isdir(repo_dir + '/.git')
 
+        was_pulled = os.path.isdir(repo_dir + '/.git')
         self.assertEqual(was_pulled, True)
 
 
     def test_set_remote_url(self):
+        """
+        We pull a repo, change the remote url and see if it got changed.
+        """
 
         expected_url = 'unittest_url'
         repo_dir = os.path.join(TMP_DIR, 'test_remoteurl_repo')
@@ -83,13 +89,15 @@ class PullPushTest(unittest.TestCase):
 
 
     def test_push(self):
+        """
+        We push a file to a target repo and see if it's there.
+        """
 
         repo_dir = os.path.join(TMP_DIR, 'test_push_repo')
         PullPush = pp.PullPush(repo_dir=repo_dir)
 
         PullPush.pull(self.repos['test_pullpush_origin'])
 
-        # # Need a commit of we cant push
         tmpfile = tempfile.NamedTemporaryFile(dir=repo_dir)
         index = PullPush.repo.index
         index.add([tmpfile.name])
