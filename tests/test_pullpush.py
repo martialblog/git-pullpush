@@ -10,10 +10,12 @@ import shutil
 import pullpush.pullpush as pp
 
 
+# Exitcodes for asserting
 EXIT_0 = 0 << 8
 EXIT_1 = 1 << 8
 EXIT_2 = 2 << 8
 
+# Here because of scope
 TMP_DIR = tempfile.mkdtemp(suffix='pullpush-unittest-repos')
 PORT = 4567
 
@@ -116,7 +118,11 @@ def test_push(repositories, gitdaemon):
     was_pushed = os.path.exists(tmpfile.name)
     assert(was_pushed == True)
 
+
 def test_main_success(repositories, gitdaemon):
+    """
+    Test if the main Script works
+    """
 
     _from = repositories['test_pullpush_origin']
     _into = repositories['test_pullpush_target']
@@ -127,7 +133,12 @@ def test_main_success(repositories, gitdaemon):
 
     assert(status == EXIT_0)
 
+
+#TODO Patch where to notify somehow
 def test_main_success_with_notify(repositories, gitdaemon):
+    """
+    Test if the notification works
+    """
 
     _from = repositories['test_pullpush_origin']
     _into = repositories['test_pullpush_target']

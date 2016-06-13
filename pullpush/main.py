@@ -12,6 +12,7 @@ from sys import exit
 DESC = 'Pulls a git repository and pushes it somewhere'
 HELP_PULL = 'The repo to pull from'
 HELP_PUSH = 'The repo to push into'
+HELP_NOTIFY = 'Notify someone about what happened'
 API_TOKEN = 'TOKEN'
 CHANNEL = '#puppet'
 
@@ -42,7 +43,7 @@ def main():
     argumentparser.add_argument('--notify',
                                 action="store_true",
                                 required=False,
-                                help="Tell Slack about it")
+                                help=HELP_NOTIFY)
 
     cmd_arguments = argumentparser.parse_args()
 
@@ -58,6 +59,7 @@ def main():
             pp.push(target)
             if cmd_arguments.notify:
                 notify(message="All's good", severity='INFO')
+
         except Exception:
             if cmd_arguments.notify:
                 notify(message="Something is wrong", severity='ERROR')
