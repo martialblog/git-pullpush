@@ -16,14 +16,15 @@ PORT = 4567
 
 # TODO
 # Sometime the gd doesn't seem to serve the repos
-# I have to idea why! -.-
-# Must have something to do with the time cause if I wait a bit it works
+# I have no idea why! -.-
+# Must have something to do with the time cause if I wait a bit (60sec) it works
+time.sleep(60)
+
 gd = git.Git().daemon(TMP_DIR,
                       enable='receive-pack',
                       listen='127.0.0.1',
                       port=PORT,
                       as_process=True)
-time.sleep(2)
 
 
 class PullPushTest(unittest.TestCase):
