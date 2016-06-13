@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # TODO Retry-If-Fail implementation
-
+# TODO Move Slack Config to seperate config file
 
 from tempfile import TemporaryDirectory
 from argparse import ArgumentParser
