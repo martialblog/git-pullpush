@@ -24,14 +24,14 @@ def notify(message, severity):
     """
 
     ICON = {
-        'INFO', ':page_with_curl:',
-        'WARN', ':warning:',
-        'ERROR', ':bangbang:',
-        '*', ':slack:'
+        'INFO': ':page_with_curl:',
+        'WARN': ':warning:',
+        'ERROR': ':bangbang:',
+        '*': ':slack:'
     }
 
     msg = '{0} {1}'.format(ICON[severity], message)
-    Slack.chat.post_message(CHANNEL, msg)
+    #Slack.chat.post_message(CHANNEL, msg)
 
 
 def main():
@@ -39,6 +39,10 @@ def main():
     argumentparser = ArgumentParser(description=DESC)
     argumentparser.add_argument('--from', dest='pullfrom', required=True, help=HELP_PULL)
     argumentparser.add_argument('--into', dest='pushto', required=True, help=HELP_PUSH)
+    argumentparser.add_argument('--notify',
+                                action="store_true",
+                                required=False,
+                                help="Tell Slack about it")
 
     cmd_arguments = argumentparser.parse_args()
 
@@ -47,12 +51,16 @@ def main():
 
     with TemporaryDirectory() as temp_dir:
         pp = PullPush(repo_dir=temp_dir)
+
+        # TODO Maybe own function
         try:
             pp.pull(origin)
             pp.push(target)
-            notify(message="All's good", severity='INFO')
+            if cmd_arguments.notify:
+                notify(message="All's good", severity='INFO')
         except Exception:
-            notify(message="Something is wrong", severity='ERROR')
+            if cmd_arguments.notify:
+                notify(message="Something is wrong", severity='ERROR')
             exit(1)
 
 

@@ -10,6 +10,10 @@ import shutil
 import pullpush.pullpush as pp
 
 
+EXIT_0 = 0 << 8
+EXIT_1 = 1 << 8
+EXIT_2 = 2 << 8
+
 TMP_DIR = tempfile.mkdtemp(suffix='pullpush-unittest-repos')
 PORT = 4567
 
@@ -111,3 +115,25 @@ def test_push(repositories, gitdaemon):
 
     was_pushed = os.path.exists(tmpfile.name)
     assert(was_pushed == True)
+
+def test_main_success(repositories, gitdaemon):
+
+    _from = repositories['test_pullpush_origin']
+    _into = repositories['test_pullpush_target']
+
+    command = '/usr/bin/env python3 pullpush/main.py --from ' + _from + ' --into ' + _into + ' > /dev/null'
+    print(command)
+    status = os.system(command)
+
+    assert(status == EXIT_0)
+
+def test_main_success_with_notify(repositories, gitdaemon):
+
+    _from = repositories['test_pullpush_origin']
+    _into = repositories['test_pullpush_target']
+
+    command = '/usr/bin/env python3 pullpush/main.py --notify --from ' + _from + ' --into ' + _into + ' > /dev/null'
+    print(command)
+    status = os.system(command)
+
+    assert(status == EXIT_0)
