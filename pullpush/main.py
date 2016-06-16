@@ -53,7 +53,6 @@ def main():
     with TemporaryDirectory() as temp_dir:
         pp = PullPush(repo_dir=temp_dir)
 
-        # TODO Maybe own function
         try:
             pp.pull(origin)
             pp.push(target)
